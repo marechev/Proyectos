@@ -343,10 +343,10 @@ listaanyos([X|Resto],Res):-
     contador_menor_cien(ListaAnyo1,ListaAnyo2,Cont,10),
     Cont>2.
 
-
+%NOTA: Busca el usuario '0' porque desde el python, antes de ejecutar este programa ProbLog, escribe la informacion recibida del usuario de la web en la BD (csv) como nuevas lineas con IDUser 0
 query(similitudUsuarios(0,_)).
-%query(similitudLibros(ISBN,_)):-
-    %tfgdb(0,_,_,ISBN,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_).
+query(similitudLibros(ISBN,_)):-
+    tfgdb(0,_,_,ISBN,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_).
 %query(similitudLibros(425184226,812550757)).
 %query(similitudUsuarios(265313,270713)).
 %query(gustaISBN(0,_)).
