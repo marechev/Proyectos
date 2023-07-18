@@ -177,8 +177,6 @@ libros_no_comun(Usuario1, Usuario2,LibrosNoComun1,LibrosNoComun2) :-
     abs(Edad1-Edad2) < 3.
 
 %si es mayor de 20 a 40
-%https://cerlalc.org/wp-content/uploads/publicaciones/olb/PUBLICACIONES_OLB_%20Metodologia-comun-para-explorar-y-medir-el-comportamiento-lector_v1_010111.pdf
-
 0.2 :: similitudUsuarios(UserID1,UserID2):-
     tieneEdad(UserID1,Edad1),
     tieneEdad(UserID2,Edad2),
@@ -226,7 +224,7 @@ contador_menor_diez([X|RestoLista1], Lista2, Contador,Baremo) :-
     contador_menor_diez(RestoLista1, Lista2, ContadorResto,Baremo),
     Contador is ResultadoResta + ContadorResto.
 
-% Predicado auxiliar para realizar la resta entre un valor y los elementos de la lista
+% Predicado aux
 resta_menor_diez(_, [], 0,Baremo).
 resta_menor_diez(X, [Y|RestoLista2], ResultadoResta, Baremo) :-
     Resta is abs(X - Y),
@@ -354,12 +352,3 @@ query(similitudLibros(385486804,_)).
 %query(listageneros([679723226],_)).
 
 
-%tema %hibrido: el usuario me pone por pantalla edad,local,un libro o dos. se van a hacer varias querys
-%% 1 query similitud usuario,añadir usuario nuevo a la base d datos con los datos(query(similitudUsuarios(UsuNuevo,_)))
-%% 1 o dos querys similitud libro con los 1 o dos libros que me haya pasado
-%% a partir de los resultados de las 3 o dos querys --> veo q hago 
-%%añado base datos 1 o dos filas nuevo userid: 000, libro tal cual
-%%pregunto similitud userid con otros
-%%pregunto similitud de los dos libros con otros
-%%similitudhibrida(userid,isbn1,isbn2):-
-%% 
