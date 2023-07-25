@@ -56,7 +56,6 @@ def test():
         p = PrologFile("prueba3.pl")
         result = get_evaluatable().create_from(p).evaluate()
         print(result)
-        # Obtener las claves correspondientes a los dos valores máximos de similitud para libros
         similitudlibros = []
         similitudusuarios=[]
         for (res1,res2) in result.items():
