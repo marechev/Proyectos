@@ -1,0 +1,496 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <title>Recomendador de libros</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+  <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon"> 
+  <style>
+    /* 
+    cd C:\Users\marpo\OneDrive\Escritorio\tfg\web
+    python -m http.server*/
+    .scroll-area {
+      max-height: 200px;
+      overflow-y: scroll;
+      margin-bottom: 10px; 
+    }
+
+  
+  body {
+    background-color: #d8f8e1;
+    font-size: 14px; 
+    text-align: justify;
+    transform: scale(1.2); 
+    transform-origin: 0 0; 
+    zoom: 1.2; /* Escala al 150% */
+  }
+  h2 {
+  font-size: 16px;
+  }
+  .list-group-item {
+  font-size: 12px; 
+}
+#ventana-emergente {
+  display: none;
+  position: fixed;
+  background-color: white;
+  z-index: 9999;
+  position: fixed;
+  top: 25%;
+  left: 25%;
+}
+
+#ventana-emergente-contenido {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  margin: 50px; 
+}
+
+#ventana-emergente-contenido h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+#ventana-emergente-contenido p {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+#btn-cerrar {
+  background-color: #fcb7af;
+  color: black;
+  border-color: #fcb7af;
+  font-weight: bold;
+}
+
+  #btn-recomendar {
+    background-color: #fcb7af;
+    color: black;
+    border-color: #fcb7af;
+    font-weight: bold;
+    margin-bottom: 20px;
+
+  }
+  #lista-checklist {
+    max-height: 150px;
+  }
+
+  
+  #edad{
+    width: 200px; 
+  }
+  #busqueda{
+    width: 630px;
+  }
+  #localizacion {
+    width: 250px;
+  }
+  .contenedor-libros {
+  display: flex; 
+  flex-wrap: wrap; 
+  justify-content: space-between;
+}
+.libro {
+  flex: 0 0 calc(33.33% - 30px); 
+  margin: 15px; 
+}
+.libro img {
+
+  object-fit: contain; 
+  margin: 0 auto;
+  display: block;
+  max-width: 100%;
+  max-height: 200px;
+  margin-bottom: 10px;
+}
+.book-item {
+  text-align: center;
+  text-align: justify;
+
+}
+.small-width {
+  width: 630px; 
+}
+
+#btnAyuda {
+    margin-top: 0.2rem; 
+    margin-bottom: 0.5rem; 
+    margin-right: 0rem;
+  }
+  </style>
+</head>
+<body data-spy="scroll" data-target="#lista-checklist" data-offset="50">
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-8 d-flex align-items-center">
+        <h1 class="display-4 mt-2">Elige tu próxima lectura</h1>
+  </div>
+  
+  <div class="col-sm-4 d-flex align-items-center mt-3">
+
+    <button id="btn-ayuda" class="btn btn-info">Ayuda</button>
+    <div id="ventana-emergente" class="ventana-emergente">
+      <div class="contenido-ventana">
+        <h2>Usa nuestro Recomendador de Libros en tres simples pasos:</h2>
+        <p>1. Selecciona tu Edad y Localización.<br>2. Elige uno o dos libros que te gustaron.<br>3. Haz clic en 'Recomendar' para descubrir tres sugerencias emocionantes.</p>
+        <button id="btn-cerrar">Cerrar</button>
+      </div>
+    </div>   
+   </div>   
+
+    <form>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label for="edad">Edad: *</label>
+            <select class="form-control" id="edad" required>
+              <option value="">Seleccione su edad</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div class="form-group">
+            <label for="localizacion">Localización: </label>
+            <select class="form-control" id="localizacion">
+              <option value="">Seleccione su localizacion</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="busqueda">Buscar libro por Titulo o Autor:</label>
+        <input type="text" class="form-control" id="busqueda" placeholder="Buscar elemento del checklist">
+      </div>
+      
+      <div class="form-group small-width">
+        <div class="scroll-area">
+          <div id="lista-checklist" class="list-group" role="tablist">
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="container">
+      <button type="submit" id="btn-recomendar" class="btn btn-primary" disabled>Recomendar</button>
+      
+      <h5 id="titulo-recomendacion" class="mb-4"></h5>
+      <div id="libros-seleccionados"class="contenedor-libros"></div>
+    </div>
+  </div>
+  <script>
+   
+
+    document.addEventListener('DOMContentLoaded', function() {
+    
+      
+      var btnAyuda = document.getElementById('btn-ayuda');
+      var ventanaEmergente = document.getElementById('ventana-emergente');
+      var btnCerrar = document.getElementById('btn-cerrar');
+      
+      btnAyuda.addEventListener('click', mostrarVentanaEmergente);
+      btnCerrar.addEventListener('click', cerrarVentanaEmergente);
+      
+      function mostrarVentanaEmergente() {
+        ventanaEmergente.style.display = 'block';
+      }
+      
+      function cerrarVentanaEmergente() {
+        ventanaEmergente.style.display = 'none';
+      }
+    });
+    </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+  <script>
+    
+  
+  const edadInput = document.getElementById('edad');
+    const localizacionInput = document.getElementById('localizacion');
+    const checklistItemsContainer = document.getElementById('lista-checklist');
+    const recomendarBtn = document.getElementById('btn-recomendar');
+ 
+  for (let i = 10; i <= 90; i++) {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = i;
+    edadInput.appendChild(option);
+  }
+
+  
+  const localizaciones = [
+      'australia',
+      'austria',
+      'belgium',
+      'brazil',
+      'bulgaria',
+      'burma',
+      'canada',
+      'china',
+      'denmark',
+      'dominican republic',
+      'england',
+      'finland',
+      'france',
+      'germany',
+      'hong kong',
+      'iceland',
+      'iran',
+      'ireland',
+      'israel',
+      'italy',
+      'japan',
+      'kenya',
+      'malaysia',
+      'mexico',
+      'netherlands',
+      'new zealand',
+      'norway',
+      'pakistan',
+      'philippines',
+      'poland',
+      'portugal',
+      'qatar',
+      'romania',
+      'singapore',
+      'south africa',
+      'south korea',
+      'spain',
+      'sweden',
+      'switzerland',
+      'thailand',
+      'trinidad and tobago',
+      'united kingdom',
+      'universe',
+      'usa'
+    ];
+
+    for (let i = 0; i < localizaciones.length; i++) {
+      const option = document.createElement('option');
+      option.value = localizaciones[i];
+      option.textContent = localizaciones[i];
+      localizacionInput.appendChild(option);
+    }
+    
+  // Cargar el json
+  fetch('http://localhost:8000/jsonconimagen.json') 
+  .then(response => response.json())
+  .then(libros => {
+    cargarChecklist(libros);
+
+    recomendarBtn.addEventListener('click', function(event) {
+  event.preventDefault(); 
+
+  const edad = document.getElementById('edad').value;
+  const localizacion = document.getElementById('localizacion').value;
+
+
+  const librosSeleccionados = document.querySelectorAll('#lista-checklist .form-check-input:checked');
+  const librosArray = Array.from(librosSeleccionados);
+  const librosSeleccionadosInfo = librosArray.map(libroSeleccionado => {
+
+    const titulo = libroSeleccionado.value;
+
+
+    const libroEncontrado = libros.find(libro => libro.Titulo === titulo);
+
+
+    return libroEncontrado;
+  });
+  const datos = {
+    edad: edad,
+    localizacion: localizacion,
+    librosSeleccionados: librosSeleccionadosInfo
+  };
+  const dict_values = {edad, localizacion,librosSeleccionadosInfo} 
+        const s = JSON.stringify(dict_values); 
+
+        var xhr = null;
+    getXmlHttpRequestObject = function () {
+        if (!xhr) {
+            xhr = new XMLHttpRequest();
+        }
+        return xhr;
+    };
+    function dataCallback() {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            console.log("User data received!");
+            getDate();
+            res = xhr.responseText;
+            console.log(res)
+        }
+    }
+    function getUsers() {
+        console.log("Get users...");
+        xhr = getXmlHttpRequestObject();
+        xhr.onreadystatechange = dataCallback;
+       
+        xhr.open("GET", "http://localhost:8001/test", true);
+        
+        xhr.send(null);
+    }
+
+    function sendDataCallback() {
+        if (xhr.readyState == 4 && xhr.status == 201) {
+            console.log("Data creation response received!");
+    
+            var res = xhr.responseText;
+            console.log(res);
+            var arr = [];
+            arr = JSON.parse(res);
+            console.log(arr);
+            const contenedorLibros = document.getElementById('libros-seleccionados');
+            const tituloRecomendacion = document.getElementById('titulo-recomendacion');
+            tituloRecomendacion.textContent = 'Libros que creemos que te podrían gustar:';
+            function agregarLibro(titulo, autor, descripcion, paginas, fecha, imagen) {
+
+              const libro = document.createElement('div');
+              libro.classList.add('libro');
+
+              const imagenElemento = document.createElement('img');
+              imagenElemento.src = imagen;
+              libro.appendChild(imagenElemento);
+
+              const tituloElemento = document.createElement('h2');
+              tituloElemento.textContent = titulo;
+              libro.appendChild(tituloElemento);
+
+              const autorElemento = document.createElement('p');
+              autorElemento.textContent = `Autor: ${autor}`;
+              libro.appendChild(autorElemento);
+
+              const descripcionElemento = document.createElement('p');
+              descripcionElemento.textContent = descripcion;
+              libro.appendChild(descripcionElemento);
+
+              const paginasElemento = document.createElement('p');
+              paginasElemento.textContent = `Páginas: ${paginas}`;
+              libro.appendChild(paginasElemento);
+
+              contenedorLibros.appendChild(libro);
+            }
+            for (let i = 0; i < arr.length; i++) {
+              console.log(arr[i]);
+              const isbnay = Number(arr[i]);
+              const libro = libros.find(aux => aux.ISBN === isbnay);
+              
+
+              if (libro) {
+                const titulo = libro.Titulo;
+                const autor = libro.Autor;
+                const paginas = libro.Paginas;
+                const fecha = libro.FechaPublicacion;
+                const descripcion = libro.Descripcion;
+                const imagen = libro.Imagen;
+
+                
+                agregarLibro(titulo, autor, descripcion, paginas, fecha, imagen);
+          
+              } else {
+                console.log("No se encontró un libro con el ISBN:", isbnay);
+              }
+            }
+            }
+    }
+    function sendData() {
+        dataToSend = datos;
+        if (!dataToSend) {
+            console.log("Data is empty.");
+            return;
+        }
+        
+        xhr = getXmlHttpRequestObject();
+        xhr.onreadystatechange = sendDataCallback;
+        xhr.open("POST", "http://localhost:8001/test", true);
+        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        xhr.send(JSON.stringify({"data": dataToSend}));
+    }
+    sendData();
+});
+  })
+  .catch(error => {
+    console.log('Error al cargar el archivo JSON:', error);
+  });
+
+
+
+
+
+
+  function cargarChecklist(libros) {
+    const listaFiltrada = libros; 
+    let listaMostrada = libros; 
+    
+    function filtrarChecklist(busqueda) {
+      const termino = busqueda.toLowerCase();
+      listaMostrada = listaFiltrada.filter(libro => {
+        const titulo = libro.Titulo.toLowerCase();
+        const autor = libro.Autor.toLowerCase();
+        return titulo.includes(termino) || autor.includes(termino);
+      });
+    }
+    
+    function mostrarChecklist() {
+    checklistItemsContainer.innerHTML = ''; 
+    listaMostrada.forEach(libro => {
+      const titulo = libro.Titulo;
+      const autor = libro.Autor;
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.value = titulo;
+      checkbox.id = titulo;
+      checkbox.classList.add('form-check-input');
+      checkbox.onchange = validarChecklist;
+      checkbox.setAttribute('data-limit', '2');
+
+      const label = document.createElement('label');
+      label.classList.add('form-check-label');
+      label.htmlFor = titulo;
+      label.textContent = `${titulo} - ${autor}`;
+
+      const div = document.createElement('div');
+      div.classList.add('form-check');
+      div.appendChild(checkbox);
+      div.appendChild(label);
+
+      checklistItemsContainer.appendChild(div);
+    });
+    }
+
+    mostrarChecklist();
+
+    const busquedaInput = document.getElementById('busqueda');
+    busquedaInput.addEventListener('input', function () {
+      const busqueda = this.value.trim();
+      filtrarChecklist(busqueda);
+      mostrarChecklist();
+    });
+  }
+
+  edadInput.addEventListener('input', validarFormulario);
+
+  function validarFormulario() {
+    const edad = edadInput.value.trim();
+    const elementosSeleccionados = document.querySelectorAll('#lista-checklist .form-check-input:checked');
+
+    if (edad !== '' && elementosSeleccionados.length > 0) {
+      recomendarBtn.disabled = false;
+    } else {
+      recomendarBtn.disabled = true;
+    }
+  }
+
+  function validarChecklist() {
+    const elementosSeleccionados = document.querySelectorAll('#lista-checklist .form-check-input:checked');
+    if (elementosSeleccionados.length > 2) {
+      this.checked = false;
+    }
+    validarFormulario();
+  }
+
+  </script>
+</body>
+</html>
