@@ -140,8 +140,6 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
         0.5:: similitudLibros(ISBN1, ISBN2) :- 
             autor(ISBN1, Autor1),
             autor(ISBN2, Autor1),
-            titulo(ISBN1,Titulo1),
-            titulo(ISBN2,Titulo2),
             ISBN1 \= ISBN2.
 
 
