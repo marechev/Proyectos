@@ -327,7 +327,7 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 %Consultas para similitudUsuarios y similitudLibros sobre usuario 0(explicado memoria)
         %query(similitudUsuarios(0,IDUsuario)):-
             %bibliotecaUsuariosResumen(usuario(IDUsuario, _Loc, _Edad,_Calificacion), _ISBN, _Libro),
-            %B \= 0.
+            %IDUsuario \= 0.
         %query(similitudLibros(ISBN,ISBN2)):-
         %bibliotecaUsuarios(0,_,_,ISBN,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_),
         %bibliotecaUsuarios(_,_,_,A,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_).
