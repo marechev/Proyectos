@@ -137,14 +137,16 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 %REGLAS PARA FILTRADO BASADO EN CONTENIDO
 
     %Similitud dos libros según autor
-        0.5:: similitudLibros(ISBN1, ISBN2) :- 
+        %Dos libros tienen un 0.7 de similitud si su autor es el mismo
+        0.7:: similitudLibros(ISBN1, ISBN2) :- 
             autor(ISBN1, Autor1),
             autor(ISBN2, Autor1),
             ISBN1 \= ISBN2.
 
 
     %Similitud dos libros según generos/etiquetas
-        0.05:: similitudLibros(ISBN1,ISBN2):-
+        %Dos libros tienen un 0.2 de similitud si comparten 1 o 2 generos 
+        0.2:: similitudLibros(ISBN1,ISBN2):-
             generos(ISBN1, Generos1),
             generos(ISBN2, Generos2),
             intersection(Generos1, Generos2, GenerosComunes),
@@ -152,8 +154,9 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
             Contador > 0,
             Contador =< 2,
             ISBN1 \= ISBN2.
-
-        0.20:: similitudLibros(ISBN1,ISBN2):-
+            
+        %Dos libros tienen un 0.6 de similitud si comparten entre 3 y 6 géneros 
+        0.60:: similitudLibros(ISBN1,ISBN2):-
             generos(ISBN1, Generos1),
             generos(ISBN2, Generos2),
             intersection(Generos1, Generos2, GenerosComunes),
@@ -161,8 +164,8 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
             Contador >= 3,
             Contador < 7,
             ISBN1 \= ISBN2.
-
-        0.4:: similitudLibros(ISBN1,ISBN2):-
+        %Dos libros tienen un 0.8 de similitud si comparten entre 7 o mas generos
+        0.8:: similitudLibros(ISBN1,ISBN2):-
             generos(ISBN1, Generos1),
             generos(ISBN2, Generos2),
             intersection(Generos1, Generos2, GenerosComunes),
@@ -172,8 +175,8 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
         
 
     %Similitud dos libros según año de publicacion
-
-        0.05 :: similitudLibros(ISBN1,ISBN2):-
+        %Dos libros tienen un 0.05 de similitud si han menos de 11 años de diferencia en su fecha de publicación
+        0.075 :: similitudLibros(ISBN1,ISBN2):-
             anyopubli(ISBN1,Anyo1),
             condicion(Anyo1,Res1),
             anyopubli(ISBN2,Anyo2),
@@ -183,6 +186,7 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 
 
     %Similitud dos libros según idioma
+        %Dos libros tienen un 0.05 de similitud si el idioma en el que fueron escritos es el mismo 
         0.05 :: similitudLibros(ISBN1,ISBN2):-
             idioma(ISBN1,Idioma1),
             idioma(ISBN2,Idioma1),
@@ -191,6 +195,8 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 
 
     %Similitud dos libros según numero de paginas
+
+        %Dos libros tienen un 0.15 de similitud si la diferencia en la cantidad de páginas entre ellos es de un máximo de 100 páginas 
         0.05 :: similitudLibros(ISBN1,ISBN2):-
             numpags(ISBN1,Num1),
             numpags(ISBN2,Num2),
@@ -202,19 +208,24 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 %REGLAS PARA EL FILTRADO COLABORATIVO
 
 
-    %Similitud usuarios segun libros en comun 
-
-            0.3 :: similitudUsuarios(Usuario1, Usuario2):-
-            libros_en_comun(Usuario1,Usuario2,LibrosEnComun),
+    %Similitud usuarios segun libros en comun
+    
+            %Dos usuarios tienen 0.4 de similitud si han calificado positivamente al menos un libro en común
+            0.4 :: similitudUsuarios(Usuario1, Usuario2):-
+            findall(Libro1, gustaISBN(Usuario1, Libro1), Lista1),
+            findall(Libro2, gustaISBN(Usuario2, Libro2), Lista2),
+            intersection(Lista1,Lista2,LibrosEnComun),
             Usuario1 \= Usuario2,
             length(LibrosEnComun,Len),
             Len > 0,
             Len < 2.
-
-        0.7 :: similitudUsuarios(Usuario1, Usuario2):-
-            bibliotecaUsuarios(Usuario2,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_),
+            
+        %Dos usuarios tienen 0.8 de similitud si han calificado positivamente mas de un libro en común
+        0.8 :: similitudUsuarios(Usuario1, Usuario2):-
             Usuario1 \= Usuario2,
-            libros_en_comun(Usuario1,Usuario2,LibrosEnComun),
+            findall(Libro1, gustaISBN(Usuario1, Libro1), Lista1),
+            findall(Libro2, gustaISBN(Usuario2, Libro2), Lista2),
+            intersection(Lista1,Lista2,LibrosEnComun),
             length(LibrosEnComun,Len),
             Len > 1.
 
@@ -336,7 +347,7 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
         query(similitudLibros(807508527,812513738)).
 
 %Predicados auxiliares para las reglas:
-        %predicado para sacar libros comunes
+        %predicado para sacar libros comunes BORRAR
             libros_en_comun(Usuario1,Usuario2,LibrosEnComun):-
                 findall(Libro1, gustaISBN(Usuario1, Libro1), Lista1),
                 findall(Libro2, gustaISBN(Usuario2, Libro2), Lista2),
