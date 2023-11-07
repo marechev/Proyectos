@@ -211,7 +211,7 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
     %Similitud usuarios segun libros en comun
     
             %Dos usuarios tienen 0.4 de similitud si han calificado positivamente al menos un libro en común
-            0.4 :: similitudUsuarios(Usuario1, Usuario2):-
+            0.5 :: similitudUsuarios(Usuario1, Usuario2):-
             findall(Libro1, gustaISBN(Usuario1, Libro1), Lista1),
             findall(Libro2, gustaISBN(Usuario2, Libro2), Lista2),
             intersection(Lista1,Lista2,LibrosEnComun),
@@ -221,7 +221,7 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
             Len < 2.
             
         %Dos usuarios tienen 0.8 de similitud si han calificado positivamente mas de un libro en común
-        0.8 :: similitudUsuarios(Usuario1, Usuario2):-
+        0.9 :: similitudUsuarios(Usuario1, Usuario2):-
             Usuario1 \= Usuario2,
             findall(Libro1, gustaISBN(Usuario1, Libro1), Lista1),
             findall(Libro2, gustaISBN(Usuario2, Libro2), Lista2),
@@ -233,32 +233,43 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 
     %Similitud usuarios segun autores comunes 
 
-        0.25 :: similitudUsuarios(Usuario1,Usuario2):-
+        %Dos usuarios tienen un 0.6 de similitud si tienen 1 autor común
+        0.65 :: similitudUsuarios(Usuario1,Usuario2):-
         contador_autores(Usuario1,Usuario2,Len),
         Len > 0,
         Len < 2.
-
-        0.35 :: similitudUsuarios(Usuario1,Usuario2):-
+        
+        %Dos usuarios tienen un 0.8 de similitud si tienen 2 autores comunes
+        0.8 :: similitudUsuarios(Usuario1,Usuario2):-
             contador_autores(Usuario1,Usuario2,Len),
             Len > 1,
             Len < 3.
-
-        0.7 :: similitudUsuarios(Usuario1,Usuario2):-
+            
+        %Dos usuarios tienen un 0.9 de similitud si tienen mas de 2 autores comunes
+        0.9 :: similitudUsuarios(Usuario1,Usuario2):-
             contador_autores(Usuario1,Usuario2,Len),
             Len > 2.
 
 
 
     %Similitud usuarios segun generos/Etiquetas comunes
-
+     
+        %Dos usuairos tienen un 0.5 de similitud si tienen entre 8 y 16 etiquetas de libros comunes
         0.5:: similitudUsuarios(Usuario1, Usuario2):-
         contador_generos(Usuario1,Usuario2,Cont),
-        Cont > 8.
+        Cont > 10,
+        Cont =< 16.
+
+        %Dos usuarios tienen un 0.5 de similitud si tiene mas de 16 etiquetas de libros comunes
+        0.85::  similitudUsuarios(Usuario1, Usuario2):-
+        contador_generos(Usuario1,Usuario2,Cont),
+        Cont > 16.
 
 
 
     %Similitud usuarios segun idioma comun 
 
+        %Dos usuarios tienen un 0.05 de similitud si todos los libros que han valorado positivamente han sido escritos en el mismo idioma
         0.05 :: similitudUsuarios(Usuario1,Usuario2):-
             comprobar_idiomas(Usuario1, Usuario2,Lista),
             todos_iguales(Lista).
@@ -267,21 +278,24 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 
     %Similitud usuarios segun num de paginas
 
-        0.005 :: similitudUsuarios(Usuario1, Usuario2):-
+        %Dos usuarios tienen un 0.05 de similitud si tienen un libro con una extensión común
+        0.05 :: similitudUsuarios(Usuario1, Usuario2):-
             findall(Paginas1, (gustaPaginas(Usuario1, ISBN1, Paginas1), \+ gustaPaginas(Usuario2, ISBN1, _)), ListaPaginas1), 
             findall(Paginas2, (gustaPaginas(Usuario2, ISBN2, Paginas2), \+ gustaPaginas(Usuario1, ISBN2, _)), ListaPaginas2), 
             contador_menor_cien(ListaPaginas1,ListaPaginas2,Cont,100),
             Cont>0,
             Cont<2.
 
-        0.008 :: similitudUsuarios(Usuario1, Usuario2):-
+        %Dos usuarios tienen un 0.1 de similitud si tienen dos libros con una extensión común
+        0.1 :: similitudUsuarios(Usuario1, Usuario2):-
             findall(Paginas1, (gustaPaginas(Usuario1, ISBN1, Paginas1), \+ gustaPaginas(Usuario2, ISBN1, _)), ListaPaginas1), 
             findall(Paginas2, (gustaPaginas(Usuario2, ISBN2, Paginas2), \+ gustaPaginas(Usuario1, ISBN2, _)), ListaPaginas2), 
             contador_menor_cien(ListaPaginas1,ListaPaginas2,Cont,100),
             Cont>1,
             Cont<3.
 
-        0.01 :: similitudUsuarios(Usuario1, Usuario2):-
+        %Dos usuarios tienen un 0.15 de similitud si tienen mas de dos libros con una extensión común
+        0.15 :: similitudUsuarios(Usuario1, Usuario2):-
             findall(Paginas1, (gustaPaginas(Usuario1, ISBN1, Paginas1), \+ gustaPaginas(Usuario2, ISBN1, _)), ListaPaginas1), 
             findall(Paginas2, (gustaPaginas(Usuario2, ISBN2, Paginas2), \+ gustaPaginas(Usuario1, ISBN2, _)), ListaPaginas2), 
             contador_menor_cien(ListaPaginas1,ListaPaginas2,Cont,100),
@@ -291,6 +305,7 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 
     %Similitud usuarios segun años de publicacion
 
+        %Dos usuarios tienen una similitud del 0.02 si tienen un libro con fechas de publicación común (10 años) 
         0.02 :: similitudUsuarios(Usuario1, Usuario2):-
             findall(Anyo1, (gustaAnyo(Usuario1, ISBN1, Anyo1), \+ gustaAnyo(Usuario2, ISBN1, _)), ListaAnyo1), 
             findall(Anyo2, (gustaAnyo(Usuario2, ISBN2, Anyo2), \+ gustaAnyo(Usuario1, ISBN2, _)), ListaAnyo2), 
@@ -300,7 +315,8 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
             Cont>0,
             Cont<2.
 
-        0.06 :: similitudUsuarios(Usuario1, Usuario2):-
+        %Dos usuarios tienen una similitud del 0.04 si tienen dos libros con fechas de publicación común (10 años) 
+        0.04 :: similitudUsuarios(Usuario1, Usuario2):-
             findall(Anyo1, (gustaAnyo(Usuario1, ISBN1, Anyo1), \+ gustaAnyo(Usuario2, ISBN1, _)), ListaAnyo1), 
             findall(Anyo2, (gustaAnyo(Usuario2, ISBN2, Anyo2), \+ gustaAnyo(Usuario1, ISBN2, _)), ListaAnyo2), 
             listaanyos(ListaAnyo1,ListaDef1),
@@ -309,7 +325,8 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
             Cont>1,
             Cont<3.
 
-        0.09 :: similitudUsuarios(Usuario1, Usuario2):-
+        %Dos usuarios tienen una similitud del 0.06 si tienen mas de dos libros con fechas de publicación común (10 años) 
+        0.06 :: similitudUsuarios(Usuario1, Usuario2):-
             findall(Anyo1, (gustaAnyo(Usuario1, ISBN1, Anyo1), \+ gustaAnyo(Usuario2, ISBN1, _)), ListaAnyo1), 
             findall(Anyo2, (gustaAnyo(Usuario2, ISBN2, Anyo2), \+ gustaAnyo(Usuario1, ISBN2, _)), ListaAnyo2), 
             listaanyos(ListaAnyo1,ListaDef1),
@@ -321,7 +338,8 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 
     %Similitud usuarios segun la edad 
 
-        0.2 :: similitudUsuarios(Usuario1,Usuario2):-
+        %Dos usuarios tienen una similitud de 0.4 si tienen una edad parecida
+        0.4 :: similitudUsuarios(Usuario1,Usuario2):-
             tieneEdad(Usuario1,Edad1),
             tieneEdad(Usuario2,Edad2),
             diferencia(Edad1, Edad2, Diferencia),
@@ -330,7 +348,8 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
 
     %Similitud usuarios segun localizacion
 
-        0.15 :: similitudUsuarios(Usuario1,Usuario2):-
+        % Dos usuarios tienen una similitud de 0.2 si tienen una misma localización
+        0.2 :: similitudUsuarios(Usuario1,Usuario2):-
             esDe(Usuario1,Local1),
             esDe(Usuario2,Local1).
 
