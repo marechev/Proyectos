@@ -59,7 +59,7 @@ def test():
             #para luego comprobar que no se recomienda el mismo que se eligio
             listaisbnselec.append(isbn)
             #se añaden estos nuevos hechos a problog
-            nueva = """tfgdb(0,'"""+str(localiz)+"""',"""+str(edad)+""","""+str(isbn)+""",10,'"""+titulo+"""','"""+autor+"""','"""+idioma+"""','"""+genero1+"""','"""+genero2+"""','"""+genero3+"""','"""+genero4+"""','"""+genero5+"""','"""+genero6+"""','"""+genero7+"""','"""+genero8+"""','"""+ genero9+"""','"""+genero10+"""',"""+str(paginas)+""","""+str(fecha_publicacion)+""")."""
+            nueva = """bibliotecaUsuarios(0,'"""+str(localiz)+"""',"""+str(edad)+""","""+str(isbn)+""",10,'"""+titulo+"""','"""+autor+"""','"""+idioma+"""','"""+genero1+"""','"""+genero2+"""','"""+genero3+"""','"""+genero4+"""','"""+genero5+"""','"""+genero6+"""','"""+genero7+"""','"""+genero8+"""','"""+ genero9+"""','"""+genero10+"""',"""+str(paginas)+""","""+str(fecha_publicacion)+""")."""
             for statement in PrologString(nueva):
                 print(statement)
                 db += statement
