@@ -257,7 +257,7 @@ bibliotecaUsuariosResumen(usuario(IDUsuario, Localizacion, Edad,Calificacion), I
     %Similitud usuarios segun generos/Etiquetas comunes
      
         %Dos usuairos tienen un 0.25 de similitud si tienen entre 2 y 5 etiquetas de libros comunes
-        0.25:: similitudUsuarios(Usuario1, Usuario2):-
+        0.2:: similitudUsuarios(Usuario1, Usuario2):-
         contador_generos(Usuario1,Usuario2,Cont),
         Cont > 1,
         Cont =< 5.
